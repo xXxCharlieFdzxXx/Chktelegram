@@ -42,14 +42,10 @@ async def handle_callbacks(call: CallbackQuery, state: FSMContext):
     elif data == "cancel_check":
         await call.message.edit_text("⛔ Proceso cancelado.")
         await state.clear()
-    elif user_id == ADMIN_ID:
-        if data == "stats":
-            await call.message.edit_text("📊 Estadísticas (en desarrollo)")
-        # Agrega más admin aquí
 
 @router.message(BotStates.waiting_single)
 async def process_single(message: Message, state: FSMContext):
-    await message.answer("✅ Procesando...")
+    await message.answer("✅ Procesando tarjeta...")
     save_live(message.from_user.id, message.text)
     await state.clear()
 
@@ -61,41 +57,4 @@ async def process_mass(message: Message, state: FSMContext):
 @router.message(BotStates.waiting_redeem)
 async def process_redeem(message: Message, state: FSMContext):
     await message.answer("🔑 Key procesada.")
-    await state.clear()        await state.set_state(CheckStates.waiting_mass)
-    elif data == "redeem":
-        await call.message.edit_text("🔑 **Redeem Key**\n\nEnvía tu key de activación:", parse_mode="Markdown")
-        await state.set_state(CheckStates.waiting_redeem)
-    elif data == "luxury":
-        await call.message.edit_text("✨ **Modo Luxury** - En desarrollo (envíame el código que quieres)", parse_mode="Markdown")
-
-@router.callback_query(F.data.in_(["stats", "generate_key", "adjust_prices", "reload_proxies"]))
-async def admin_callbacks(call: CallbackQuery):
-    await call.answer()
-    if call.from_user.id != ADMIN_ID:
-        await call.message.edit_text("❌ No tienes permiso.")
-        return
-
-    if call.data == "stats":
-        await call.message.edit_text("📊 **Estadísticas**\nLives totales: 0\nUsuarios activos: 1", reply_markup=admin_menu())
-    elif call.data == "generate_key":
-        await call.message.edit_text("🔑 **Generar Keys**\n\nUsa el comando /genkey <cantidad> <días> (próximamente botones)", reply_markup=admin_menu())
-    elif call.data == "adjust_prices":
-        await call.message.edit_text("💰 **Ajustar Precios** - En desarrollo", reply_markup=admin_menu())
-    elif call.data == "reload_proxies":
-        await call.message.edit_text("🔄 **Recargando proxies globales**...", reply_markup=admin_menu())
-
-@router.message(CheckStates.waiting_single)
-async def process_single(message: Message, state: FSMContext):
-    # Aquí irá la lógica del checker single
-    await message.answer("✅ Procesando tarjeta...")
-    await state.clear()
-
-@router.message(CheckStates.waiting_mass)
-async def process_mass(message: Message, state: FSMContext):
-    await message.answer("📊 Procesando mass check (en desarrollo)...")
-    await state.clear()
-
-@router.message(CheckStates.waiting_redeem)
-async def process_redeem(message: Message, state: FSMContext):
-    await message.answer("🔑 Verificando key...")
     await state.clear()
