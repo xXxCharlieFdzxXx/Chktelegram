@@ -1,0 +1,5 @@
+aiogram
+aiohttp
+colorama
+fake-useragent
+requests
