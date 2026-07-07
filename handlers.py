@@ -29,19 +29,25 @@ async def handle_callbacks(call: CallbackQuery, state: FSMContext):
     user_id = call.from_user.id
 
     if data == "single":
-        await call.message.edit_text("🔍 **Single Check**\nEnvía la tarjeta:", parse_mode="Markdown")
+        await call.message.edit_text("🔍 **Single Check**\nEnvía la tarjeta en formato: `cc|mm|yy|cvv`", parse_mode="Markdown")
         await state.set_state(BotStates.waiting_single)
     elif data == "mass":
-        await call.message.edit_text("📁 **Mass Check**\nEnvía .txt o pega tarjetas:", parse_mode="Markdown", reply_markup=cancel_button())
+        await call.message.edit_text("📁 **Mass Check**\nEnvía .txt o pega tarjetas (máx 50)", parse_mode="Markdown", reply_markup=cancel_button())
         await state.set_state(BotStates.waiting_mass)
     elif data == "proxies":
         await call.message.edit_text("⚙️ **Gestión de Proxies**", reply_markup=proxies_menu())
     elif data == "redeem":
-        await call.message.edit_text("🔑 Envía tu key:", parse_mode="Markdown")
+        await call.message.edit_text("🔑 **Redeem Key**\nEnvía tu key:", parse_mode="Markdown")
         await state.set_state(BotStates.waiting_redeem)
     elif data == "cancel_check":
         await call.message.edit_text("⛔ Proceso cancelado.")
         await state.clear()
+    # Admin buttons
+    elif user_id == ADMIN_ID:
+        if data in ["stats", "generate_key", "adjust_prices", "reload_proxies", "active_users", "all_lives"]:
+            await call.message.edit_text(f"🔧 {data.replace('_', ' ').title()} - En desarrollo", reply_markup=admin_menu())
+    else:
+        await call.message.edit_text("Opción en desarrollo.")
 
 @router.message(BotStates.waiting_single)
 async def process_single(message: Message, state: FSMContext):
@@ -51,10 +57,10 @@ async def process_single(message: Message, state: FSMContext):
 
 @router.message(BotStates.waiting_mass)
 async def process_mass(message: Message, state: FSMContext):
-    await message.answer("📊 Mass check en desarrollo...")
+    await message.answer("📊 Procesando mass check (en desarrollo)...")
     await state.clear()
 
 @router.message(BotStates.waiting_redeem)
 async def process_redeem(message: Message, state: FSMContext):
-    await message.answer("🔑 Key procesada.")
+    await message.answer("🔑 Verificando key...")
     await state.clear()
