@@ -1,25 +1,27 @@
 import asyncio
-from aiogram import Router
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import save_live
-# from proxypool import proxy_pool  # Descomenta cuando lo integres
+# from proxypool import proxy_pool  # Integra tu pool aquí
 
 router = Router()
 
-async def check_card(card: str):
-    await asyncio.sleep(1.5)  # Simula chequeo
-    return {"status": "LIVE", "details": "Visa Classic MX"}
+async def check_card(card: str) -> dict:
+    await asyncio.sleep(1)  # Simula tiempo real
+    return {"status": "LIVE", "type": "Visa", "level": "Classic", "country": "MX"}
 
-@router.message()
-async def process_card(message: Message, state: FSMContext):
-    current_state = await state.get_state()
-    if not current_state:
-        return
-    result = await check_card(message.text)
-    if result["status"] == "LIVE":
-        save_live(message.from_user.id, message.text)
-        await message.answer(f"✅ **LIVE** {message.text}")
-    else:
-        await message.answer("❌ Declined")
+class CheckStates(StatesGroup):
+    mass_check = State()
+
+@router.message(CheckStates.mass_check)
+async def process_mass_check(message: Message, state: FSMContext):
+    await message.answer("📊 Iniciando Mass Check...")
+    # Lógica de procesamiento en batch con progreso aquí
+    await state.clear()
+
+@router.callback_query(F.data == "cancel_check")
+async def cancel_process(call: CallbackQuery, state: FSMContext):
+    await call.message.edit_text("⛔ Proceso cancelado.")
     await state.clear()
