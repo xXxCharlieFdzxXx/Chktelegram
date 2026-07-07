@@ -33,7 +33,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS lives (
 conn.commit()
 
 def init_db():
-    print("✅ Base de datos inicializada.")
+    print("✅ Base de datos SQLite inicializada correctamente.")
 
 def get_user(user_id: int):
     c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
