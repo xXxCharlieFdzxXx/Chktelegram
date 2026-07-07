@@ -1,37 +1,25 @@
 import asyncio
 from aiogram import Router
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from database import save_live
-from proxypool import proxy_pool  # Tu pool original
+# from proxypool import proxy_pool  # Descomenta cuando lo integres
 
 router = Router()
 
-async def check_card(card: str) -> dict:
-    """Tu lógica real de checker aquí"""
-    # Ejemplo simulado
-    await asyncio.sleep(1.5)
-    return {
-        "status": "LIVE",
-        "type": "Visa",
-        "level": "Classic",
-        "country": "MX",
-        "gate": "Stripe Auth"
-    }
+async def check_card(card: str):
+    await asyncio.sleep(1.5)  # Simula chequeo
+    return {"status": "LIVE", "details": "Visa Classic MX"}
 
 @router.message()
-async def process_check(message: Message, state: FSMContext):
+async def process_card(message: Message, state: FSMContext):
     current_state = await state.get_state()
     if not current_state:
         return
-
-    card = message.text.strip()
-    result = await check_card(card)
-
+    result = await check_card(message.text)
     if result["status"] == "LIVE":
-        save_live(message.from_user.id, card, result["gate"])
-        await message.answer(f"✅ **LIVE**\n{card}\n{result['type']} {result['level']} {result['country']}")
+        save_live(message.from_user.id, message.text)
+        await message.answer(f"✅ **LIVE** {message.text}")
     else:
         await message.answer("❌ Declined")
-
     await state.clear()
