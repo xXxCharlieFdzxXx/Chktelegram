@@ -35,19 +35,19 @@ async def handle_callbacks(call: CallbackQuery, state: FSMContext):
         await call.message.edit_text("📁 **Mass Check**\nEnvía .txt o pega tarjetas:", parse_mode="Markdown", reply_markup=cancel_button())
         await state.set_state(BotStates.waiting_mass)
     elif data == "proxies":
-        await call.message.edit_text("⚙️ **Proxies**", reply_markup=proxies_menu())
+        await call.message.edit_text("⚙️ **Gestión de Proxies**", reply_markup=proxies_menu())
     elif data == "redeem":
         await call.message.edit_text("🔑 Envía tu key:", parse_mode="Markdown")
         await state.set_state(BotStates.waiting_redeem)
     elif data == "cancel_check":
-        await call.message.edit_text("⛔ Cancelado.")
+        await call.message.edit_text("⛔ Proceso cancelado.")
         await state.clear()
     elif user_id == ADMIN_ID:
         await call.message.edit_text(f"🔧 {data.replace('_', ' ').title()} - En desarrollo", reply_markup=admin_menu())
 
 @router.message(BotStates.waiting_single)
 async def process_single(message: Message, state: FSMContext):
-    await message.answer("✅ Procesando...")
+    await message.answer("✅ Procesando tarjeta...")
     save_live(message.from_user.id, message.text)
     await state.clear()
 
